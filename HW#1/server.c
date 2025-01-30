@@ -40,77 +40,76 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    printf("Server listening on port %d\n", PORT);
-
-    // Accept incoming connection
-    socklen_t addr_size = sizeof(client_addr);
-    if ((client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &addr_size)) == -1)
-    {
-        perror("Acceptance failed");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Client connected\n");
-
     int num1, num2, answer, choice;
 
-
-    // Communication loop
+    // Accepting loop
     while (1)
     {
-        char *message1 = "Input Number 1: ";
-        write(client_socket, message1, strlen(message1));
-        read(client_socket, &num1, sizeof(int));
-        printf("Client - Number 1 is: %d\n", num1);
+        printf("Server listening on port %d\n", PORT);
 
-        char *message2 = "Input Number 2: ";
-        write(client_socket, message2, strlen(message2));
-        read(client_socket, &num2, sizeof(int));
-        printf("Client - Number 2 is: %d\n", num2);
-
-        char *message3 = "Choose an operation:\n(1)Addition\n(2)Subtraction\n(3)Multiplication\n(4)Division\nChoice: ";
-        write(client_socket, message3, strlen(message3));
-        read(client_socket, &choice, sizeof(int));
-        printf("Client - Choice is: %d\n", choice);
-
-        switch(choice) {
-            case 1:
-                answer = num1 + num2;
-                break;
-            case 2:
-                answer = num1 - num2;
-                break;
-            case 3:
-                answer = num1 * num2;
-                break;
-            case 4:
-                answer = num1 / num2;
-                break;
-            default:
-                printf("s");
+        // Accept incoming connection
+        socklen_t addr_size = sizeof(client_addr);
+        if ((client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &addr_size)) == -1)
+        {
+            perror("Acceptance failed");
+            exit(EXIT_FAILURE);
         }
 
-        write(client_socket, &answer, sizeof(int));
+        printf("Client connected\n");
+    
+        // Communication loop
+        while(1)
+        {
+            char *message1 = "Input Number 1: ";
+            write(client_socket, message1, strlen(message1));
+            read(client_socket, &num1, sizeof(int));
+            printf("Client - Number 1 is: %d\n", num1);
 
-        // ssize_t bytes_received = recv(client_socket, &buffer, sizeof(int), 0);
-        // // Receive message from client
-        // if (bytes_received <= 0)
-        // {
-        //     perror("Receive failed");
-        //     break;
-        // }
+            char *message2 = "Input Number 2: ";
+            write(client_socket, message2, strlen(message2));
+            read(client_socket, &num2, sizeof(int));
+            printf("Client - Number 2 is: %d\n", num2);
 
-        // int new_num = 0;
-        // new_num = buffer * buffer;
+            char *message3 = "Choose an operation:\n(1)Addition\n(2)Subtraction\n(3)Multiplication\n(4)Division\n(5)Exit\nChoice: ";
+            write(client_socket, message3, strlen(message3));
+            read(client_socket, &choice, sizeof(int));
+            printf("Client - Choice is: %d\n", choice);
 
-        // printf("Client sent: %d\n", buffer);
-        // printf("Your number squared is: %d\n", new_num);
+            switch(choice) {
+                case 1:
+                    answer = num1 + num2;
+                    break;
+                case 2:
+                    answer = num1 - num2;
+                    break;
+                case 3:
+                    answer = num1 * num2;
+                    break;
+                case 4:
+                    answer = num1 / num2;
+                    break;
+                case 5:
+                    printf("Closing client socket\n");
+                    close(client_socket);
+                    break;
+            }
 
-        // send(client_socket, &buffer, sizeof(int), 0);
+            if(answer)
+            {
+                write(client_socket, &answer, sizeof(int));
+            }
+
+            if(choice == 5)
+            {
+                break;
+            }
+
+        }
+
+
     }
 
     close(server_socket);
-    close(client_socket);
 
     return 0;
 }

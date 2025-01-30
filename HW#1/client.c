@@ -55,41 +55,29 @@ int main()
         scanf("%d", &num1);
         write(client_socket, &num1, sizeof(int));
 
-        memset(buffer, 0, BUFFER_SIZE); // Clear the buffer
         read(client_socket, buffer, sizeof(buffer));
         printf("Server - %s", buffer);
         scanf("%d", &num2);
         write(client_socket, &num2, sizeof(int));
 
-        memset(buffer, 0, BUFFER_SIZE); // Clear the buffer
         read(client_socket, buffer, sizeof(buffer));
         printf("Server - %s", buffer);
         scanf("%d", &choice);
         write(client_socket, &choice, sizeof(int));
 
+        if(choice == 5)
+        {
+            printf("Closing connection\n");
+            close(client_socket); 
+            exit(EXIT_SUCCESS);
+        }
+
         read(client_socket, &answer, sizeof(int));
         printf("Server - The answer is: %d\n", answer);
-    // //     printf("Client: ");
-    // //     scanf("%d", &buffer);
 
-    //     // Send message to server
-    //     // send(client_socket, &buffer, sizeof(int), 0);
 
-    //     // // memset(buffer, 0, BUFFER_SIZE); // Clear the buffer
-
-    //     // // Receive message from server
-    //     // ssize_t bytes_received = recv(client_socket, &buffer, sizeof(int), 0);
-
-    //     // if (bytes_received <= 0)
-    //     // {
-    //     //     perror("Receive failed"); // Display error if receiving message fails
-    //     //     exit(EXIT_FAILURE);
-    //     // }
-
-    //     // printf("Server: %d\n", buffer); // Display server's response
     }
 
-    close(client_socket); // Close the socket connection
 
     return 0;
 }
