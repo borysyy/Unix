@@ -43,9 +43,6 @@ int main()
     printf("Connected to server\n");
     int num1, num2, answer, choice;
     
-
-
-
     // Communication loop
     while (1)
     {
@@ -74,7 +71,6 @@ int main()
 
         read(client_socket, &answer, sizeof(int));
         printf("Server - The answer is: %d\n", answer);
-
 
     }
 
