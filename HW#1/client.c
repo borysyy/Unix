@@ -5,12 +5,19 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <ctype.h>
 
 #define PORT 8888
 #define BUFFER_SIZE 1024
 
-int main()
+int main(int argc, char *argv[])
 {
+    if(argc == 1)
+    {
+        printf("USAGE: ./client IP ADDRESS PORT#");
+        return 1;
+    }
+
     int client_socket;
     struct sockaddr_in server_addr;
     char buffer[BUFFER_SIZE];
@@ -22,12 +29,14 @@ int main()
         exit(EXIT_FAILURE);
     }
 
+    int port = atoi(argv[2]);
+
     // Configure server address
     server_addr.sin_family = AF_INET; // IPv4 address family
-    server_addr.sin_port = htons(PORT); // Set the port number
+    server_addr.sin_port = htons(port); // Set the port number
     
     // Set the IP address
-    if(inet_pton(AF_INET, "127.0.0.1", &(server_addr.sin_addr)) <= 0)
+    if(inet_pton(AF_INET, argv[1], &(server_addr.sin_addr)) <= 0)
     {
         printf("Invalid Address\n");
         exit(EXIT_FAILURE);
@@ -41,36 +50,45 @@ int main()
     }
 
     printf("Connected to server\n");
-    int num1, num2, answer, choice;
-    
+    printf("Example math problem: 1 + 1\n");
+
     // Communication loop
     while (1)
     {
-        memset(buffer, 0, BUFFER_SIZE); // Clear the buffer
-        read(client_socket, buffer, sizeof(buffer));
-        printf("Server - %s", buffer);
-        scanf("%d", &num1);
-        write(client_socket, &num1, sizeof(int));
+        char flag;
 
-        read(client_socket, buffer, sizeof(buffer));
+        memset(buffer, 0, BUFFER_SIZE);
+        recv(client_socket, buffer, BUFFER_SIZE, 0);
         printf("Server - %s", buffer);
-        scanf("%d", &num2);
-        write(client_socket, &num2, sizeof(int));
 
-        read(client_socket, buffer, sizeof(buffer));
-        printf("Server - %s", buffer);
-        scanf("%d", &choice);
-        write(client_socket, &choice, sizeof(int));
+        fgets(buffer, sizeof(buffer), stdin);
+        buffer[strcspn(buffer, "\n")] = 0;
 
-        if(choice == 5)
+
+        if(strcmp(buffer, "exit") == 0)
         {
+            send(client_socket, buffer, strlen(buffer), 0);
             printf("Closing connection\n");
             close(client_socket); 
             exit(EXIT_SUCCESS);
         }
 
-        read(client_socket, &answer, sizeof(int));
-        printf("Server - The answer is: %d\n", answer);
+        send(client_socket, buffer, strlen(buffer), 0);
+        memset(buffer, 0, BUFFER_SIZE);
+
+        recv(client_socket, &flag, sizeof(char), 0);
+
+        if(flag == 'R')
+        {
+            int answer = 0;
+            recv(client_socket, &answer, sizeof(int), 0);
+            printf("Server - The answer is: %d\n", answer);
+        }
+        else if(flag == 'E')
+        {
+            recv(client_socket, buffer, BUFFER_SIZE, 0);
+            printf("Server - %s\n", buffer);
+        }
 
     }
 

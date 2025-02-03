@@ -9,10 +9,23 @@
 #define PORT 8888
 #define BUFFER_SIZE 1024
 
-int main()
+void send_message(int client_socket, const char* message)
 {
+    send(client_socket, message, strlen(message), 0);
+}
+
+
+int main(int argc, char *argv[])
+{
+    if(argc == 1)
+    {
+        printf("USAGE: ./server PORT#");
+        return 1;
+    }
+
     int server_socket, client_socket;
     struct sockaddr_in server_addr, client_addr;
+    char buffer[BUFFER_SIZE];
 
     // Create socket
     if ((server_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
@@ -21,9 +34,11 @@ int main()
         exit(EXIT_FAILURE);
     }
 
+    int port = atoi(argv[1]);
+
     // Configure server address
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(PORT);
+    server_addr.sin_port = htons(port);
     server_addr.sin_addr.s_addr = INADDR_ANY;
 
     // Bind socket
@@ -40,13 +55,12 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    int num1, num2, answer, choice;
+
+    printf("Server listening on port %d\n", PORT);
 
     // Accepting loop
     while (1)
     {
-        printf("Server listening on port %d\n", PORT);
-
         // Accept incoming connection
         socklen_t addr_size = sizeof(client_addr);
         if ((client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &addr_size)) == -1)
@@ -60,50 +74,73 @@ int main()
         // Communication loop
         while(1)
         {
-            char *message1 = "Input Number 1: ";
-            write(client_socket, message1, strlen(message1));
-            read(client_socket, &num1, sizeof(int));
-            printf("Client - Number 1 is: %d\n", num1);
+            int num1, num2, answer = 0;
+            char operator, flag;
 
-            char *message2 = "Input Number 2: ";
-            write(client_socket, message2, strlen(message2));
-            read(client_socket, &num2, sizeof(int));
-            printf("Client - Number 2 is: %d\n", num2);
+            sleep(1);
+            
+            send_message(client_socket, "Enter math problem or \"exit\" to leave: ");
+            memset(buffer, 0, BUFFER_SIZE);
+            recv(client_socket, buffer, sizeof(buffer), 0);
 
-            char *message3 = "Choose an operation:\n(1)Addition\n(2)Subtraction\n(3)Multiplication\n(4)Division\n(5)Exit\nChoice: ";
-            write(client_socket, message3, strlen(message3));
-            read(client_socket, &choice, sizeof(int));
-            printf("Client - Choice is: %d\n", choice);
+            if(strcmp(buffer, "exit") == 0)
+            {
+               printf("Closing client socket\n");
+               close(client_socket);
+               break;
+            }
 
-            switch(choice) {
-                case 1:
+            printf("Client - %s\n", buffer);
+
+
+            if(sscanf(buffer, "%d %c %d", &num1, &operator, &num2) == 3)
+            {
+                switch (operator)
+                {
+                case '+':
                     answer = num1 + num2;
                     break;
-                case 2:
+                case '-':
                     answer = num1 - num2;
                     break;
-                case 3:
+                case '*':
                     answer = num1 * num2;
                     break;
-                case 4:
-                    answer = num1 / num2;
+                case '/':
+                    if(num2 != 0)
+                    {
+                        answer = num1 / num2;
+                    }
+                    else 
+                    {
+                        flag = 'E';
+                        send(client_socket, &flag, sizeof(char), 0);
+                        send_message(client_socket, "Error: Dividing by zero!");
+                        continue;
+                    }
                     break;
-                case 5:
-                    printf("Closing client socket\n");
-                    close(client_socket);
-                    break;
+                   
+                default:
+                    flag = 'E';
+                    send(client_socket, &flag, sizeof(char), 0);
+                    send_message(client_socket, "Error: Invalid operator!");
+                    continue;
+                }
+              
             }
-
-            if(answer)
+            else
             {
-                write(client_socket, &answer, sizeof(int));
+                flag = 'E';
+                send(client_socket, &flag, sizeof(char), 0);
+                send_message(client_socket, "Error: Invalid input format!");
+                continue;
             }
 
-            if(choice == 5)
-            {
-                break;
-            }
+            flag = 'R';
+            send(client_socket, &flag, sizeof(char), 0);
+            send(client_socket, &answer, sizeof(int), 0);
 
+    
         }
 
 
