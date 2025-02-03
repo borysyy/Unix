@@ -6,7 +6,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#define PORT 8888
 #define BUFFER_SIZE 1024
 
 void send_message(int client_socket, const char* message)
