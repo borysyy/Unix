@@ -24,10 +24,11 @@ int main(int argc, char *argv[])
     // Create a socket for communication
     if ((client_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     {
-        perror("Socket creation failed"); // Display error if socket creation fails
+        perror("Socket creation failed"); 
         exit(EXIT_FAILURE);
     }
 
+    char* ip_address = argv[1];
     int port = atoi(argv[2]);
 
     // Configure server address
@@ -35,7 +36,7 @@ int main(int argc, char *argv[])
     server_addr.sin_port = htons(port); // Set the port number
     
     // Set the IP address
-    if(inet_pton(AF_INET, argv[1], &(server_addr.sin_addr)) <= 0)
+    if(inet_pton(AF_INET, ip_address, &(server_addr.sin_addr)) <= 0)
     {
         printf("Invalid Address\n");
         exit(EXIT_FAILURE);
@@ -59,7 +60,7 @@ int main(int argc, char *argv[])
         memset(buffer, 0, BUFFER_SIZE);
         recv(client_socket, buffer, BUFFER_SIZE, 0);
         printf("Server - %s", buffer);
-
+        
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = 0;
 
@@ -73,7 +74,6 @@ int main(int argc, char *argv[])
         }
 
         send(client_socket, buffer, strlen(buffer), 0);
-        memset(buffer, 0, BUFFER_SIZE);
 
         recv(client_socket, &flag, sizeof(char), 0);
 
@@ -85,6 +85,7 @@ int main(int argc, char *argv[])
         }
         else if(flag == 'E')
         {
+            memset(buffer, 0, BUFFER_SIZE);
             recv(client_socket, buffer, BUFFER_SIZE, 0);
             printf("Server - %s\n", buffer);
         }

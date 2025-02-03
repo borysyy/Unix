@@ -54,7 +54,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-
     printf("Server listening on port %d\n", port);
 
     // Accepting loop
@@ -139,9 +138,7 @@ int main(int argc, char *argv[])
             send(client_socket, &flag, sizeof(char), 0);
             send(client_socket, &answer, sizeof(int), 0);
 
-    
         }
-
 
     }
 
