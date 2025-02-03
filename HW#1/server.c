@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     }
 
 
-    printf("Server listening on port %d\n", PORT);
+    printf("Server listening on port %d\n", port);
 
     // Accepting loop
     while (1)
