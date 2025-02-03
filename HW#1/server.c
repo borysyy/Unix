@@ -6,13 +6,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+void send_message(int, const char*);
+
 #define BUFFER_SIZE 1024
-
-void send_message(int client_socket, const char* message)
-{
-    send(client_socket, message, strlen(message), 0);
-}
-
 
 int main(int argc, char *argv[])
 {
@@ -147,4 +143,9 @@ int main(int argc, char *argv[])
     close(server_socket);
 
     return 0;
+}
+
+void send_message(int client_socket, const char* message)
+{
+    send(client_socket, message, strlen(message), 0);
 }
