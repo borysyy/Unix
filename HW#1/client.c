@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // Initial messages
+    // Initial messages for client
     printf("Connected to server\n");
     printf("Example math problem: 1 + 1\n");
     printf("Allowed operators: + , - , * , /\n");

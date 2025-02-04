@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
             printf("Client - %s\n", buffer);
 
             // Check if the user inputted the correct format string
-            // EX. 1 + 2 
+            // EX. 1 + 1
             if(sscanf(buffer, "%d %c %d", &num1, &operator, &num2) == 3)
             {
                 switch (operator)
