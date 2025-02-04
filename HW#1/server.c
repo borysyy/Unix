@@ -8,7 +8,7 @@
 
 void send_message(int, const char*);
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 256
 
 int main(int argc, char *argv[])
 {
