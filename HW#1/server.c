@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+// Function prototype
 void send_message(int, const char*);
 
 #define BUFFER_SIZE 256
@@ -151,6 +152,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+// Custom function for sending a message to the client 
 void send_message(int client_socket, const char* message)
 {
     send(client_socket, message, strlen(message), 0);
