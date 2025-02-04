@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
     if(argc == 1)
     {
-        printf("USAGE: ./client IP ADDRESS PORT#");
+        printf("USAGE: ./client IP_ADDRESS PORT#");
         return 1;
     }
 
@@ -51,44 +51,30 @@ int main(int argc, char *argv[])
 
     printf("Connected to server\n");
     printf("Example math problem: 1 + 1\n");
+    printf("Allowed operators: + , - , * , /\n");
 
     // Communication loop
     while (1)
     {
-        char flag;
 
         memset(buffer, 0, BUFFER_SIZE);
         recv(client_socket, buffer, BUFFER_SIZE, 0);
-        printf("Server - %s", buffer);
+        printf("\nServer - %s", buffer);
         
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = 0;
 
-
+        send(client_socket, buffer, strlen(buffer), 0);
         if(strcmp(buffer, "exit") == 0)
         {
-            send(client_socket, buffer, strlen(buffer), 0);
             printf("Closing connection\n");
             close(client_socket); 
             exit(EXIT_SUCCESS);
         }
 
-        send(client_socket, buffer, strlen(buffer), 0);
-
-        recv(client_socket, &flag, sizeof(char), 0);
-
-        if(flag == 'R')
-        {
-            int answer = 0;
-            recv(client_socket, &answer, sizeof(int), 0);
-            printf("Server - The answer is: %d\n", answer);
-        }
-        else if(flag == 'E')
-        {
-            memset(buffer, 0, BUFFER_SIZE);
-            recv(client_socket, buffer, BUFFER_SIZE, 0);
-            printf("Server - %s\n", buffer);
-        }
+        memset(buffer, 0, BUFFER_SIZE);
+        recv(client_socket, buffer, BUFFER_SIZE, 0);
+        printf("Server - %s\n", buffer);
 
     }
 

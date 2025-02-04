@@ -69,10 +69,12 @@ int main(int argc, char *argv[])
         while(1)
         {
             int num1, num2, answer = 0;
-            char operator, flag;
+            char operator;
 
-            
+            sleep(1);
+
             send_message(client_socket, "Enter math problem or \"exit\" to leave: ");
+
             memset(buffer, 0, BUFFER_SIZE);
             recv(client_socket, buffer, sizeof(buffer), 0);
 
@@ -84,7 +86,6 @@ int main(int argc, char *argv[])
             }
 
             printf("Client - %s\n", buffer);
-
 
             if(sscanf(buffer, "%d %c %d", &num1, &operator, &num2) == 3)
             {
@@ -106,36 +107,26 @@ int main(int argc, char *argv[])
                     }
                     else 
                     {
-                        flag = 'E';
-                        send(client_socket, &flag, sizeof(char), 0);
                         send_message(client_socket, "Error: Dividing by zero!");
-                        sleep(1);
                         continue;
                     }
                     break;
                    
                 default:
-                    flag = 'E';
-                    send(client_socket, &flag, sizeof(char), 0);
                     send_message(client_socket, "Error: Invalid operator!");
-                    sleep(1);
                     continue;
                 }
               
             }
             else
             {
-                flag = 'E';
-                send(client_socket, &flag, sizeof(char), 0);
                 send_message(client_socket, "Error: Invalid input format!");
-                sleep(1);
                 continue;
             }
 
-            flag = 'R';
-            send(client_socket, &flag, sizeof(char), 0);
-            send(client_socket, &answer, sizeof(int), 0);
-
+            char message[256];
+            sprintf(message, "%s = %d", buffer, answer);
+            send_message(client_socket, message);
         }
 
     }
