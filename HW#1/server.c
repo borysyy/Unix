@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in server_addr, client_addr;
     char buffer[BUFFER_SIZE];
 
-    // Create s socket
+    // Create a socket
     if ((server_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     {
         perror("Socket creation failed");
