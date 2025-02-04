@@ -12,6 +12,7 @@ void send_message(int, const char*);
 
 int main(int argc, char *argv[])
 {
+    // Check if argument count is just 1
     if(argc == 1)
     {
         printf("USAGE: ./server PORT#");
@@ -22,13 +23,14 @@ int main(int argc, char *argv[])
     struct sockaddr_in server_addr, client_addr;
     char buffer[BUFFER_SIZE];
 
-    // Create socket
+    // Create s socket
     if ((server_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     {
         perror("Socket creation failed");
         exit(EXIT_FAILURE);
     }
 
+    // Convert port string to integer
     int port = atoi(argv[1]);
 
     // Configure server address
@@ -50,6 +52,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    // Server is listening message
     printf("Server listening on port %d\n", port);
 
     // Accepting loop
@@ -71,13 +74,17 @@ int main(int argc, char *argv[])
             int num1, num2, answer = 0;
             char operator;
 
+            // Wait before sending message between inputs
             sleep(1);
 
+            // Message for client to submit input
             send_message(client_socket, "Enter math problem or \"exit\" to leave: ");
 
+            // Clear the buffer
             memset(buffer, 0, BUFFER_SIZE);
             recv(client_socket, buffer, sizeof(buffer), 0);
 
+            // Check if the client exited 
             if(strcmp(buffer, "exit") == 0)
             {
                printf("Closing client socket\n");
@@ -87,6 +94,8 @@ int main(int argc, char *argv[])
 
             printf("Client - %s\n", buffer);
 
+            // Check if the user inputted the correct format string
+            // EX. 1 + 2 
             if(sscanf(buffer, "%d %c %d", &num1, &operator, &num2) == 3)
             {
                 switch (operator)
@@ -111,19 +120,25 @@ int main(int argc, char *argv[])
                         continue;
                     }
                     break;
-                   
+                // If client inputted incorrect operator then send error
                 default:
                     send_message(client_socket, "Error: Invalid operator!");
                     continue;
                 }
               
             }
+            // If client inputted incorrect string format then send error
             else
             {
                 send_message(client_socket, "Error: Invalid input format!");
                 continue;
             }
 
+
+            // Send the client a string formatted as:
+            // 1 + 1 = 2
+            // buffer - Initial client input
+            // answer - Answer to client's input
             char message[256];
             sprintf(message, "%s = %d", buffer, answer);
             send_message(client_socket, message);

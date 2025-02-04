@@ -11,6 +11,7 @@
 
 int main(int argc, char *argv[])
 {
+    // Check if argument count is just 1
     if(argc == 1)
     {
         printf("USAGE: ./client IP_ADDRESS PORT#");
@@ -21,13 +22,14 @@ int main(int argc, char *argv[])
     struct sockaddr_in server_addr;
     char buffer[BUFFER_SIZE];
 
-    // Create a socket for communication
+    // Create a socket 
     if ((client_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     {
         perror("Socket creation failed"); 
         exit(EXIT_FAILURE);
     }
 
+    // IP Address and convert port string to integer
     char* ip_address = argv[1];
     int port = atoi(argv[2]);
 
@@ -49,6 +51,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    // Initial messages
     printf("Connected to server\n");
     printf("Example math problem: 1 + 1\n");
     printf("Allowed operators: + , - , * , /\n");
@@ -56,15 +59,20 @@ int main(int argc, char *argv[])
     // Communication loop
     while (1)
     {
-
+        // Clear the buffer
         memset(buffer, 0, BUFFER_SIZE);
+        // Receive server's inital message
         recv(client_socket, buffer, BUFFER_SIZE, 0);
         printf("\nServer - %s", buffer);
         
+        // Get the math problem from user
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = 0;
 
+        // Send to server
         send(client_socket, buffer, strlen(buffer), 0);
+
+        // Check if the client wants to exit
         if(strcmp(buffer, "exit") == 0)
         {
             printf("Closing connection\n");
@@ -73,6 +81,7 @@ int main(int argc, char *argv[])
         }
 
         memset(buffer, 0, BUFFER_SIZE);
+        // Receive the server's response to client's input
         recv(client_socket, buffer, BUFFER_SIZE, 0);
         printf("Server - %s\n", buffer);
 
