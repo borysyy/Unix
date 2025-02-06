@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
         if(strcmp(buffer, "exit") == 0)
         {
             printf("Closing connection\n");
+            shutdown(client_socket, SHUT_RDWR);
             close(client_socket); 
             exit(EXIT_SUCCESS);
         }
