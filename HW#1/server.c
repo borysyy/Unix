@@ -31,6 +31,15 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
+    int yes = 1;
+    
+
+    // lose the pesky "Address already in use" error message
+    if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes) == -1) {
+        perror("setsockopt");
+        exit(1);
+    }
+
     // Convert port string to integer
     int port = atoi(argv[1]);
 
