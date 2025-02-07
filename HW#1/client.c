@@ -6,14 +6,15 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 1024
+
+ssize_t recv_message(int, char *, size_t);
 
 int main(int argc, char *argv[])
 {
-    // Check if argument count is just 1
-    if(argc == 1)
+    if(argc != 3)
     {
-        printf("USAGE: ./client IP_ADDRESS PORT#");
+        printf("USAGE: ./client IP_ADDRESS PORT#\n");
         return 1;
     }
 
@@ -21,72 +22,81 @@ int main(int argc, char *argv[])
     struct sockaddr_in server_addr;
     char buffer[BUFFER_SIZE];
 
-    // Create a socket 
     if ((client_socket = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     {
-        perror("Socket creation failed"); 
+        perror("Socket creation failed");
         exit(EXIT_FAILURE);
     }
 
-    // IP Address and convert port string to integer
     char* ip_address = argv[1];
     int port = atoi(argv[2]);
 
-    // Configure server address
-    server_addr.sin_family = AF_INET; // IPv4 address family
-    server_addr.sin_port = htons(port); // Set the port number
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(port);
     
-    // Set the IP address
     if(inet_pton(AF_INET, ip_address, &(server_addr.sin_addr)) <= 0)
     {
         printf("Invalid Address\n");
         exit(EXIT_FAILURE);
     }
 
-    // Connect to server
     if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)
     {
-        perror("Connection failed"); // Display error if connection fails
+        perror("Connection failed");
         exit(EXIT_FAILURE);
     }
 
-    // Initial messages for client
     printf("Connected to server\n");
     printf("Example math problem: 1 + 1\n");
     printf("Allowed operators: + , - , * , /\n");
 
-    // Communication loop
     while (1)
     {
-        // Clear the buffer
         memset(buffer, 0, BUFFER_SIZE);
-        // Receive server's inital message
-        recv(client_socket, buffer, BUFFER_SIZE, 0);
+        ssize_t bytes_received = recv_message(client_socket, buffer, BUFFER_SIZE);
+
         printf("\nServer - %s", buffer);
-        
-        // Get the math problem from user
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = 0;
 
-        // Send to server
         send(client_socket, buffer, strlen(buffer), 0);
 
-        // Check if the client wants to exit
         if(strcmp(buffer, "exit") == 0)
         {
             printf("Closing connection\n");
-            shutdown(client_socket, SHUT_RDWR);
-            close(client_socket); 
+            close(client_socket);
             exit(EXIT_SUCCESS);
         }
 
         memset(buffer, 0, BUFFER_SIZE);
-        // Receive the server's response to client's input
-        recv(client_socket, buffer, BUFFER_SIZE, 0);
+        bytes_received = recv_message(client_socket, buffer, BUFFER_SIZE);
+
+        buffer[bytes_received] = '\0';
         printf("Server - %s\n", buffer);
-
     }
-
 
     return 0;
 }
+
+ssize_t recv_message(int client_socket, char *buffer, size_t buffer_size) 
+{
+    ssize_t bytes_received = recv(client_socket, buffer, buffer_size - 1, 0);
+
+    if (bytes_received == 0) 
+    {
+        printf("Connection closed by peer\n");
+        return 0; // Graceful disconnect
+    } 
+    else if (bytes_received == -1) 
+    {
+        perror("recv failed");
+        return -1; // Error occurred
+    }
+
+    // Send acknowledgment back to the server
+    const char *ack = "ACK"; 
+    send(client_socket, ack, strlen(ack), 0);
+
+    return bytes_received;
+}
+
