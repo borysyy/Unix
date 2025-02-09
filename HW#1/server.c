@@ -136,18 +136,11 @@ int main(int argc, char *argv[])
 
 void send_message(int client_socket, const char* message)
 {
-    ssize_t total_sent = 0;
-    ssize_t bytes_to_send = strlen(message);
-
-    while (total_sent < bytes_to_send) {
-        ssize_t sent = send(client_socket, message + total_sent, bytes_to_send - total_sent, 0);
-        if (sent == -1) {
-            perror("send failed");
-            return;
-        }
-        total_sent += sent;
+    if ( send(client_socket, message, strlen(message), 0) == -1) {
+        perror("send failed");
+        return;
     }
-
+    
     // Wait for the client to acknowledge receipt before sending the next message
     char ack[3];
     ssize_t bytes_received = recv(client_socket, ack, sizeof(ack), 0); // Waiting for acknowledgment

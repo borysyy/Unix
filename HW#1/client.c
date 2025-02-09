@@ -8,7 +8,7 @@
 
 #define BUFFER_SIZE 1024
 
-ssize_t recv_message(int, char *, size_t);
+void recv_message(int, char *, size_t);
 
 int main(int argc, char *argv[])
 {
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     while (1)
     {
         memset(buffer, 0, BUFFER_SIZE);
-        ssize_t bytes_received = recv_message(client_socket, buffer, BUFFER_SIZE);
+        recv_message(client_socket, buffer, BUFFER_SIZE);
 
         printf("\nServer - %s", buffer);
         fgets(buffer, sizeof(buffer), stdin);
@@ -69,34 +69,31 @@ int main(int argc, char *argv[])
         }
 
         memset(buffer, 0, BUFFER_SIZE);
-        bytes_received = recv_message(client_socket, buffer, BUFFER_SIZE);
+        recv_message(client_socket, buffer, BUFFER_SIZE);
 
-        buffer[bytes_received] = '\0';
         printf("Server - %s\n", buffer);
     }
 
     return 0;
 }
 
-ssize_t recv_message(int client_socket, char *buffer, size_t buffer_size) 
+void recv_message(int client_socket, char *buffer, size_t buffer_size) 
 {
     ssize_t bytes_received = recv(client_socket, buffer, buffer_size - 1, 0);
 
     if (bytes_received == 0) 
     {
         printf("Connection closed by peer\n");
-        return 0; // Graceful disconnect
     } 
     else if (bytes_received == -1) 
     {
         perror("recv failed");
-        return -1; // Error occurred
+        exit(EXIT_FAILURE);
     }
 
     // Send acknowledgment back to the server
     const char *ack = "ACK"; 
     send(client_socket, ack, strlen(ack), 0);
 
-    return bytes_received;
 }
 
