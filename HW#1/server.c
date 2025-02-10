@@ -1,7 +1,16 @@
-//This is the server program that will accept client connections and perform math operations based on the client requests.
-//TCP server that performs basic math operations (+, -, *, /) based on the client requests
-//Used TCP because it is connection-oriented and reliable , suitable for real-time applications like this one.
-//Didn't use UDP because it is connectionless and unreliable, not suitable for real-time applications.
+/*
+CS 528 - Unix Network Programming
+Program: server.c
+Assignment: HW#2
+Authors: Slava Borysyuk, Taylor Hunter
+Date: 02/09/2025
+
+This is the server program that will accept client connections and perform math operations based on the client requests.
+TCP server that performs basic math operations (+, -, *, /) based on the client requests
+Used TCP because it is connection-oriented and reliable , suitable for real-time applications like this one.
+Didn't use UDP because it is connectionless and unreliable, not suitable for real-time applications.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

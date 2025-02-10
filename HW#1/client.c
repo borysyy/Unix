@@ -1,8 +1,17 @@
-//This is the client.c file. The client.c file is responsible for connecting to the server and sending and receiving messages. 
-//The client.c file is similar to the server.c file, but it does not have the logic to perform calculations.
-//TCP client that connects to a server and sends and receives messages
-//Used TCP because it is a reliable connection-oriented protocol suitable for real-time applications like this one.
-//Didn't use UDP because it is a connectionless and unreliable protocol, not suitable for real-time applications. 
+/*
+CS 528 - Unix Network Programming
+Program: client.c
+Assignment: HW#2
+Authors: Slava Borysyuk, Taylor Hunter
+Date: 02/09/2025
+
+This is the client.c file. The client.c file is responsible for connecting to the server and sending and receiving messages. 
+The client.c file is similar to the server.c file, but it does not have the logic to perform calculations.
+TCP client that connects to a server and sends and receives messages
+Used TCP because it is a reliable connection-oriented protocol suitable for real-time applications like this one.
+Didn't use UDP because it is a connectionless and unreliable protocol, not suitable for real-time applications. 
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
