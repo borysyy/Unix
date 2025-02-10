@@ -152,6 +152,7 @@ void send_message(int client_socket, const char* message)
     
     if (bytes_received == -1) {
         perror("Client did not acknowledge the message\n");
+        exit(EXIT_FAILURE);
     }
 
     printf("Client acknowledged: %s\n", ack);

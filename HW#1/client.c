@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
         if(send(client_socket, buffer, strlen(buffer), 0) == -1)
         {
             perror("send failed");
+            exit(EXIT_FAILURE);
         }
 
         if(strcmp(buffer, "exit") == 0)
@@ -97,6 +98,7 @@ ssize_t recv_message(int client_socket, char *buffer, size_t buffer_size)
     if(send(client_socket, ack, strlen(ack), 0) == -1)
     {
         perror("send failed");
+        exit(EXIT_FAILURE);
     }
 
     return bytes_received;
