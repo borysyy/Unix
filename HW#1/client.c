@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
     {
         memset(buffer, 0, BUFFER_SIZE); //Clear the buffer to store the user's input
         ssize_t bytes_received = recv_message(client_socket, buffer, BUFFER_SIZE); //Receive a message from the server and store it in the buffer
+        buffer[bytes_received] = '\0';
 
         printf("\nServer - %s", buffer); //Print the message received from the server 
         fgets(buffer, sizeof(buffer), stdin); //Get user input from the console
