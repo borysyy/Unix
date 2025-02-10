@@ -76,8 +76,13 @@ int main(int argc, char *argv[])
 
             memset(buffer, 0, BUFFER_SIZE);
             ssize_t bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0);
+            
+            if (bytes_received == -1) 
+            {
+                perror("Client did not acknowledge the message\n");
+            }
 
-            buffer[bytes_received] = '\0'; 
+            buffer[bytes_received] = '\0';
 
             if(strcmp(buffer, "exit") == 0)
             {
@@ -136,9 +141,8 @@ int main(int argc, char *argv[])
 
 void send_message(int client_socket, const char* message)
 {
-    if ( send(client_socket, message, strlen(message), 0) == -1) {
+    if (send(client_socket, message, strlen(message), 0) == -1) {
         perror("send failed");
-        return;
     }
     
     // Wait for the client to acknowledge receipt before sending the next message
@@ -146,9 +150,8 @@ void send_message(int client_socket, const char* message)
     ssize_t bytes_received = recv(client_socket, ack, sizeof(ack), 0); // Waiting for acknowledgment
     ack[bytes_received] = '\0';
     
-    if (bytes_received <= 0) {
-        printf("Client did not acknowledge the message\n");
-        return;
+    if (bytes_received == -1) {
+        perror("Client did not acknowledge the message\n");
     }
 
     printf("Client acknowledged: %s\n", ack);

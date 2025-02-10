@@ -8,7 +8,7 @@
 
 #define BUFFER_SIZE 1024
 
-void recv_message(int, char *, size_t);
+ssize_t recv_message(int, char *, size_t);
 
 int main(int argc, char *argv[])
 {
@@ -53,13 +53,17 @@ int main(int argc, char *argv[])
     while (1)
     {
         memset(buffer, 0, BUFFER_SIZE);
-        recv_message(client_socket, buffer, BUFFER_SIZE);
+        ssize_t bytes_received = recv_message(client_socket, buffer, BUFFER_SIZE);
+        buffer[bytes_received] = '\0';
 
         printf("\nServer - %s", buffer);
         fgets(buffer, sizeof(buffer), stdin);
         buffer[strcspn(buffer, "\n")] = 0;
 
-        send(client_socket, buffer, strlen(buffer), 0);
+        if(send(client_socket, buffer, strlen(buffer), 0) == -1)
+        {
+            perror("send failed");
+        }
 
         if(strcmp(buffer, "exit") == 0)
         {
@@ -69,7 +73,8 @@ int main(int argc, char *argv[])
         }
 
         memset(buffer, 0, BUFFER_SIZE);
-        recv_message(client_socket, buffer, BUFFER_SIZE);
+        bytes_received = recv_message(client_socket, buffer, BUFFER_SIZE);
+        buffer[bytes_received] = '\0';
 
         printf("Server - %s\n", buffer);
     }
@@ -77,15 +82,11 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void recv_message(int client_socket, char *buffer, size_t buffer_size) 
+ssize_t recv_message(int client_socket, char *buffer, size_t buffer_size) 
 {
     ssize_t bytes_received = recv(client_socket, buffer, buffer_size - 1, 0);
 
-    if (bytes_received == 0) 
-    {
-        printf("Connection closed by peer\n");
-    } 
-    else if (bytes_received == -1) 
+    if (bytes_received == -1) 
     {
         perror("recv failed");
         exit(EXIT_FAILURE);
@@ -93,7 +94,11 @@ void recv_message(int client_socket, char *buffer, size_t buffer_size)
 
     // Send acknowledgment back to the server
     const char *ack = "ACK"; 
-    send(client_socket, ack, strlen(ack), 0);
+    if(send(client_socket, ack, strlen(ack), 0) == -1)
+    {
+        perror("send failed");
+    }
 
+    return bytes_received;
 }
 
