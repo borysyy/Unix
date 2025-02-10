@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
     //Set up the server address structure
     server_addr.sin_family = AF_INET;  //Set the address family to IPv4
-    server_addr.sin_port = htons(port);  //Conbert the port number to network byte order
+    server_addr.sin_port = htons(port);  //Convert the port number to network byte order
     server_addr.sin_addr.s_addr = INADDR_ANY; //Bind to all available network interfaces
 
     //Bind the socket to the specified address and port (Beej's Guide: Section 5.2 - "bind()")
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
         if ((client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &addr_size)) == -1)
         {
             perror("Acceptance failed");
-            continue;
+            exit(EXIT_FAILURE);
         }
 
         printf("Client connected\n");
@@ -161,20 +161,13 @@ int main(int argc, char *argv[])
 //Function to send messages to the client socket
 void send_message(int client_socket, const char* message)
 {   
-    ssize_t total_sent = 0; //Total bytes sent to the client
-    ssize_t bytes_to_send = strlen(message); //Bytes to send to the client
-    //Send the message to the client in a loop until all bytes are sent
-    while (total_sent < bytes_to_send) {
-        // Send the message to the client
-        ssize_t sent = send(client_socket, message + total_sent, bytes_to_send - total_sent, 0);
-        // Check if the send failed
-        if (sent == -1) {
-            perror("send failed");
-            return;
-        }
-        total_sent += sent;
+    // Send message to client
+    if(send(client_socket, message, strlen(message), 0) == -1)
+    {
+        perror("send failed");
+        exit(EXIT_FAILURE);
     }
-
+       
     // Wait for the client to acknowledge receipt before sending the next message 
     char ack[3];
     ssize_t bytes_received = recv(client_socket, ack, sizeof(ack), 0); // Waiting for acknowledgment from the client

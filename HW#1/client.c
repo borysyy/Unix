@@ -96,17 +96,11 @@ int main(int argc, char *argv[])
 ssize_t recv_message(int client_socket, char *buffer, size_t buffer_size) 
 {
     ssize_t bytes_received = recv(client_socket, buffer, buffer_size - 1, 0); //Receive a message from the server and store it in the buffer
-    //Check if the receive operation was successful
-    if (bytes_received == 0) 
-    {
-        //If the connection is closed by the server, print a message and return 0
-        printf("Connection closed by peer\n");
-        return 0; // Graceful disconnect
-    } 
-    else if (bytes_received == -1) //Check if an error occurred during the receive operation
+   
+    if (bytes_received == -1) //Check if an error occurred during the receive operation
     {
         perror("recv failed");
-        return -1; // Error occurred
+        exit(EXIT_FAILURE);
     }
 
     // Send acknowledgment back to the server (Beej's Guide: Section 6.2 - "send()")
