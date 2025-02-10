@@ -69,9 +69,12 @@ int main(int argc, char *argv[])
         fgets(buffer, sizeof(buffer), stdin); //Get user input from the console
         buffer[strcspn(buffer, "\n")] = 0; //Remove the newline character from the user input
 
-        send(client_socket, buffer, strlen(buffer), 0); //Send the user input to the server, (Beej's Guide: Section 5.2 - "send()")
+        if(send(client_socket, buffer, strlen(buffer), 0) == -1)
+        {
+            perror("send failed");
+            exit(EXIT_FAILURE);
+        }
 
-        //Check if the user wants to exit the program
         if(strcmp(buffer, "exit") == 0)
         {
             //If the user wants to exit, close the client socket and exit the program
@@ -108,7 +111,11 @@ ssize_t recv_message(int client_socket, char *buffer, size_t buffer_size)
 
     // Send acknowledgment back to the server (Beej's Guide: Section 6.2 - "send()")
     const char *ack = "ACK"; 
-    send(client_socket, ack, strlen(ack), 0);
+    if(send(client_socket, ack, strlen(ack), 0) == -1)
+    {
+        perror("send failed");
+        exit(EXIT_FAILURE);
+    }
 
     return bytes_received;
 }

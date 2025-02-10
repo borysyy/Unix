@@ -179,10 +179,10 @@ void send_message(int client_socket, const char* message)
     char ack[3];
     ssize_t bytes_received = recv(client_socket, ack, sizeof(ack), 0); // Waiting for acknowledgment from the client
     ack[bytes_received] = '\0';
-    // Check if the client acknowledged the message
-    if (bytes_received <= 0) {
-        printf("Client did not acknowledge the message\n");
-        return;
+    
+    if (bytes_received == -1) {
+        perror("Client did not acknowledge the message\n");
+        exit(EXIT_FAILURE);
     }
 
     printf("Client acknowledged: %s\n", ack);
