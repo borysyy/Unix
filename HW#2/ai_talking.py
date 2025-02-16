@@ -61,7 +61,7 @@ if __name__ == "__main__":
     chat_history.append({"role": "user", "content": initial_message})
     
     # ip = str(input("IP of other computer: "))
-    ip = '150.156.81.71'
+    ip = '192.168.1.80'
     send_message(chat_history, ip)
     
     

@@ -11,3 +11,4 @@
 
 *.dSYM
 .vscode
+__pycache__
