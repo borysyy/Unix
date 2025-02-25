@@ -93,7 +93,7 @@ if __name__ == "__main__":
     
     d = datetime.now()
     
-    f = open(f"conversation-{d}", "x")
+    f = open(f"conversation-{d}.txt", "x")
     
     first_ai(chat_history)
 
