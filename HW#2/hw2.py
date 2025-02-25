@@ -39,7 +39,7 @@ def first_ai(chat_history):
         
         chat_history.append(first_ai_response)
         
-        r = f"\nFIRST AI RESPONSE {first_ai_model} - {first_ai_response['content']}"
+        r = f"\nFIRST AI RESPONSE {first_ai_model.upper} - {first_ai_response['content']}"
                 
         print_write_file(r)        
         
@@ -64,7 +64,7 @@ def second_ai(chat_history):
             
         chat_history.append(second_ai_response)
         
-        r = f"\nSECOND AI RESPONSE {second_ai_model} - {second_ai_response['content']}"
+        r = f"\nSECOND AI RESPONSE {second_ai_model.upper} - {second_ai_response['content']}"
         
         print_write_file(r)        
 
