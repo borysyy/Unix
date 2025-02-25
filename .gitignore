@@ -9,6 +9,8 @@
 
 !Makefile
 
+conversation*
+
 *.dSYM
 .vscode
 __pycache__
