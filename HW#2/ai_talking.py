@@ -1,58 +1,61 @@
 import requests
 import json
 from pprint import pprint
+from ollama import Client
 
-def receive_message(chat_history, ip):
-    data = {
-        "model": "llama3.1",
-        "messages": chat_history,
-        "stream": False
-    }
+
+def receive_message(chat_history):
+
+    client = Client(
+        host=f"http://localhost:11435",
+        headers={
+            'Content-Type': 'application/json'
+        }   
+    )
+
+    response = client.chat(
+        model="llama3.1",
+        messages=chat_history
+    )
+
+    response['message']['role'] = 'user'
+
+    chat_history.append(response['message'])
+
+    local_response = response['message']['content']
+ 
+    print(f"\nLOCAL RESPONSE - {local_response}")
     
-    url = "http://localhost:11434/api/chat"
-    response = requests.post(url, json=data)
-    
-    json_data = response.json()
-    local_response = json_data['message']
-    
-    local_response["role"] = "user"
-        
-    chat_history.append(local_response)
-    
-    print(f"\nLOCAL RESPONSE - {local_response['content']}")
-    
-    send_message(chat_history, ip)
+    send_message(chat_history)
     
     
     
-def send_message(chat_history, ip):
-    data = {
-            "model": "llama3.1",
-            "messages": chat_history,
-            "stream": False
-        }
-    url = f"http://{ip}:11434/api/chat"
-    response = requests.post(url, json=data)
+def send_message(chat_history):
+ 
+    client = Client(
+        host=f"http://172.17.0.2:11434",
+        headers={
+            'Content-Type': 'application/json'
+        }   
+    )
+
+    response = client.chat(
+        model="llama3.1",
+        messages=chat_history
+    )
+
+    response['message']['role'] = 'user'
+
+    chat_history.append(response['message'])
+
+    remote_response = response['message']['content']
+
+    # pprint(f"CHAT HISTORY {chat_history}")
     
-    if response.status_code == 200:
-        # pprint(response.json())
-        json_data = response.json()
-        remote_response = json_data['message']
-        
-        
-        remote_response["role"] = "user"
-        
-        chat_history.append(remote_response)
-        
-        pprint(f"CHAT HISTORY {chat_history}")
-        
-        print(f"\nREMOTE RESPONSE - {remote_response['content']}")
-        
-        receive_message(chat_history, ip)
-        
-    else:
-        print(f"Error: {response.status_code}")
+    print(f"\nREMOTE RESPONSE - {remote_response}")
     
+    receive_message(chat_history)
+  
 
 
 if __name__ == "__main__":
@@ -61,8 +64,8 @@ if __name__ == "__main__":
     chat_history.append({"role": "user", "content": initial_message})
     
     # ip = str(input("IP of other computer: "))
-    ip = '192.168.1.80'
-    send_message(chat_history, ip)
+    ip = '172.17.0.2'
+    send_message(chat_history)
     
     
     # Keep getting a message from the user

@@ -1,7 +1,7 @@
 from ollama import Client
 
 client = Client(
-    host="http://localhost:11434",
+    host="http://localhost:11435",
     headers={
         'Content-Type': 'application/json'
     }
