@@ -1,7 +1,5 @@
 import requests
-import json
 from datetime import datetime
-from pprint import pprint
 
 def call_api(model, ip):
     data = {
