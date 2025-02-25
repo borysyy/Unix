@@ -1,75 +1,78 @@
 import requests
 import json
 from pprint import pprint
-
-def receive_message(chat_history, ip):
+    
+def first_ai(chat_history):
+    global first_ai_model, first_ai_ip
+    
     data = {
-        "model": "llama3.1",
+            "model": first_ai_model,
+            "messages": chat_history,
+            "stream": False
+    }
+    
+    url = f"http://{first_ai_ip}:11434/api/chat"
+    response = requests.post(url, json=data)
+    
+    if response.status_code == 200:
+        
+        json_data = response.json()
+        
+        first_ai_response = json_data['message']
+        
+        first_ai_response["role"] = "user"
+        
+        chat_history.append(first_ai_response)
+                
+        print(f"\nREMOTE RESPONSE - {first_ai_response['content']}")
+        
+        second_ai(chat_history)
+        
+    else:
+        print(f"Error: {response.status_code}")
+
+def second_ai(chat_history):
+    global second_ai_ip, second_ai_ip
+    
+    data = {
+        "model": second_ai_ip,
         "messages": chat_history,
         "stream": False
     }
     
-    url = "http://150.156.81.70:11434/api/chat"
-    response = requests.post(url, json=data)
-    
-    json_data = response.json()
-    local_response = json_data['message']
-    
-    local_response["role"] = "user"
-        
-    chat_history.append(local_response)
-    
-    print(f"\nLOCAL RESPONSE - {local_response['content']}")
-    
-    send_message(chat_history, ip)
-    
-    
-    
-def send_message(chat_history, ip):
-    data = {
-            "model": "llama3.1",
-            "messages": chat_history,
-            "stream": False
-        }
-    url = f"http://{ip}:11434/api/chat"
+    url = f"http://{second_ai_ip}:11434/api/chat"
     response = requests.post(url, json=data)
     
     if response.status_code == 200:
-        # pprint(response.json())
+        
         json_data = response.json()
-        remote_response = json_data['message']
         
-        remote_response["role"] = "user"
-        
-        chat_history.append(remote_response)
-        
-        # pprint(f"CHAT HISTORY {chat_history}")
-        
-        print(f"\nREMOTE RESPONSE - {remote_response['content']}")
-        
-        receive_message(chat_history, ip)
-        
+        second_ai_response = json_data['message']
+
+        second_ai_response["role"] = "user"
+            
+        chat_history.append(second_ai_response)
+
+        print(f"\nLOCAL RESPONSE - {second_ai_response['content']}")
+
+        first_ai(chat_history)
+    
     else:
         print(f"Error: {response.status_code}")
     
-
+    
 
 if __name__ == "__main__":
     chat_history = []
+    
+    first_ai_ip = str(input("First IP: "))
+    first_ai_model = str(input("First Model: "))
+    
+    second_ai_ip = str(input("Second IP: "))
+    second_ai_ip = str(input("Second Model: "))
+    
     initial_message = str(input("Initial message: "))
     chat_history.append({"role": "user", "content": initial_message})
     
-    # ip = str(input("IP of other computer: "))
-    ip = '150.156.81.71'
-    send_message(chat_history, ip)
+    first_ai(chat_history)
     
-    
-    # Keep getting a message from the user
-    # while(1):
-        
-        # message = str(input("Message: "))
-        
-        # if message == "exit":
-        #     break
-        
-                
