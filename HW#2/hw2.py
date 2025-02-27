@@ -1,4 +1,5 @@
 import requests
+import os
 from datetime import datetime
 
 def call_api(model, ip):
@@ -14,13 +15,13 @@ def call_api(model, ip):
     return response
 
 
-def print_write_file(r):
+def print_write_file(r_string):
     global f
     
-    print(r)
+    print(r_string)
     
     f = open(f.name, "a")
-    f.write(r)
+    f.write(r_string + "\n")
     f.close()
 
 
@@ -39,9 +40,9 @@ def first_ai(chat_history):
         
         chat_history.append(first_ai_response)
         
-        r = f"\nFIRST AI RESPONSE {first_ai_model.upper()} - {first_ai_response['content']}"
+        r_string = f"\nFIRST AI RESPONSE {first_ai_model.upper()} - {first_ai_response['content']}"
                 
-        print_write_file(r)        
+        print_write_file(r_string)        
         
         second_ai(chat_history)
         
@@ -64,9 +65,9 @@ def second_ai(chat_history):
             
         chat_history.append(second_ai_response)
         
-        r = f"\nSECOND AI RESPONSE {second_ai_model.upper()} - {second_ai_response['content']}"
+        r_string = f"\nSECOND AI RESPONSE {second_ai_model.upper()} - {second_ai_response['content']}"
         
-        print_write_file(r)        
+        print_write_file(r_string)        
 
         first_ai(chat_history)
     
@@ -89,9 +90,21 @@ if __name__ == "__main__":
     initial_message = str(input("Initial message: "))
     chat_history.append({"role": "user", "content": initial_message})
     
-    d = datetime.now()
+    date = datetime.now()
     
-    f = open(f"conversation-{d}.txt", "x")
+    directory = "Conversations"
+    
+    try:
+        os.mkdir(directory)
+        print("Directory created")
+    except OSError:
+        print("Directory already exists")
+    
+    filename = f"conversation-{date}.txt"
+    
+    file_path = os.path.join(directory, filename)
+    
+    f = open(file_path, "x")
     
     first_ai(chat_history)
 
