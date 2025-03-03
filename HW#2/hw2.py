@@ -14,7 +14,7 @@ import os  # Import the os module
 from datetime import datetime # Import the datetime module
 
 # Function to call the API of the first AI model and the second AI model
-def call_api(model, ip):
+def call_api(model, chat_history, ip):
     # Data to send to the API
     data = {   
         "model": model,  # Model name 
@@ -30,11 +30,11 @@ def call_api(model, ip):
 # Function to write the conversation to a file with the current date and time in the filename
 # and print the conversation to the console
 def print_write_file(r_string):
-    global f  # Global variable for the file
+    global file_path  # Global variable for the file path
     
     print(r_string) # Print to console
     
-    f = open(f.name, "a")  # Open the file in append mode
+    f = open(file_path, "a")  # Open the file in append mode
     f.write(r_string + "\n")  # Write to the file
     f.close()  # Close the file
 
@@ -42,7 +42,7 @@ def print_write_file(r_string):
 def first_ai(chat_history):
     global first_ai_model, first_ai_ip   # Global variables for first AI model and IP
     
-    response = call_api(first_ai_model, first_ai_ip)  # Call the API
+    response = call_api(first_ai_model, chat_history, first_ai_ip)  # Call the API
 
     if response.status_code == 200:  # If the response is successful (status code 200)
         
@@ -61,13 +61,13 @@ def first_ai(chat_history):
         second_ai(chat_history)  # Call the second AI
         
     else:
-        print(f"Error FIRST AI: {response.status_code}") # Print error message if the response is not successful
+        print(f"FIRST AI Error: {response.status_code}") # Print error message if the response is not successful
 
 # Function to call the second AI model
 def second_ai(chat_history):
     global second_ai_model, second_ai_ip  # Global variables for second AI model and IP
     
-    response = call_api(second_ai_model, second_ai_ip)  # Call the API
+    response = call_api(second_ai_model, chat_history, second_ai_ip)  # Call the API
     
     if response.status_code == 200:   # If the response is successful (status code 200)
         
@@ -117,9 +117,7 @@ if __name__ == "__main__":
     filename = f"conversation-{date}.txt" # Create a filename based on the current date and time
     
     file_path = os.path.join(directory, filename) # Create the full path to the file
-    
-    f = open(file_path, "x") # Open the file in write mode
-    
+        
     first_ai(chat_history) # Call the first AI model to start the conversation
 
     
