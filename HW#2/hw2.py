@@ -78,9 +78,7 @@ def second_ai(chat_history):
         second_ai_response["role"] = "user" # Set the role to user
             
         chat_history.append(second_ai_response)  # Append the response to the chat history
-        
-        r = f"\nSECOND AI RESPONSE {second_ai_model.upper()} - {second_ai_response['content']}"  # Create a string to print and write to file
-        
+                
         r_string = f"\nSECOND AI RESPONSE {second_ai_model.upper()} - {second_ai_response['content']}" # Create a string to print and write to file
         
         print_write_file(r_string)    # Print and write to file
@@ -106,7 +104,6 @@ if __name__ == "__main__":
     initial_message = str(input("Initial message: "))  # Get the initial message
     chat_history.append({"role": "user", "content": initial_message})  # Append the initial message to the chat history
     
-    d = datetime.now()  # Get the current date and time
     date = datetime.now() # Get the current date and time
     
     directory = "Conversations" # Specify the directory to save the conversations
