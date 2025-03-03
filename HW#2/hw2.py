@@ -1,18 +1,7 @@
-# CS 528 - Unix Network Programming
-# Program: client.c
-# Assignment: HW#2
-# Authors: Slava Borysyuk, Taylor Hunter
-# Date: 02/09/2025
-# This program is a client that connects to two different AI models and sends messages to 
-# them in a loop. The client will send a message to the first AI model, then send the response 
-# to the second AI model, and then send the response back to the first AI model. 
-# The conversation will continue until the user stops the program. The client will write the 
-# conversation to a file with the current date and time in the filename.
+import requests
+import os
+from datetime import datetime
 
-import requests  # Import the requests module
-from datetime import datetime  # Import the datetime module
-
-# Define the API endpoint URL
 def call_api(model, ip):
     data = {
         "model": model,  # Model name
@@ -25,17 +14,17 @@ def call_api(model, ip):
     
     return response
 
-# Print and write to file
-def print_write_file(r):
-    global f  # File object
-    
-    print(r) # Print to console
-    
-    f = open(f.name, "a")  # Open file in append mode
-    f.write(r)  # Write to file
-    f.close()  # Close file
 
-# Main function to call the first AI
+def print_write_file(r_string):
+    global f
+    
+    print(r_string) # Print to console
+    
+    f = open(f.name, "a")
+    f.write(r_string + "\n")
+    f.close()
+
+
 def first_ai(chat_history):
     global first_ai_model, first_ai_ip   # Global variables for first AI model and IP
     
@@ -51,9 +40,9 @@ def first_ai(chat_history):
         
         chat_history.append(first_ai_response)  # Append the response to the chat history
         
-        r = f"\nFIRST AI RESPONSE {first_ai_model.upper()} - {first_ai_response['content']}" # Create a string to print and write to file
+        r_string = f"\nFIRST AI RESPONSE {first_ai_model.upper()} - {first_ai_response['content']}"
                 
-        print_write_file(r)     # Print and write to file
+        print_write_file(r_string)        
         
         second_ai(chat_history)  # Call the second AI
         
@@ -77,10 +66,11 @@ def second_ai(chat_history):
         chat_history.append(second_ai_response)  # Append the response to the chat history
         
         r = f"\nSECOND AI RESPONSE {second_ai_model.upper()} - {second_ai_response['content']}"  # Create a string to print and write to file
+        r_string = f"\nSECOND AI RESPONSE {second_ai_model.upper()} - {second_ai_response['content']}"
         
-        print_write_file(r)      # Print and write to file
+        print_write_file(r_string)        
 
-        first_ai(chat_history)  # Call the first AI again
+        first_ai(chat_history)
     
     else:
         print(f"SECOND AI Error: {response.status_code}")   # Print error message if the response is not successful
@@ -102,9 +92,22 @@ if __name__ == "__main__":
     chat_history.append({"role": "user", "content": initial_message})  # Append the initial message to the chat history
     
     d = datetime.now()  # Get the current date and time
+    date = datetime.now()
     
-    f = open(f"conversation-{d}.txt", "x")  # Create a new file with the current date and time
+    directory = "Conversations"
     
-    first_ai(chat_history)  # Call the first AI
+    try:
+        os.mkdir(directory)
+        print("Directory created")
+    except OSError:
+        print("Directory already exists")
+    
+    filename = f"conversation-{date}.txt"
+    
+    file_path = os.path.join(directory, filename)
+    
+    f = open(file_path, "x")
+    
+    first_ai(chat_history)
 
     
