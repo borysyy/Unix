@@ -2,7 +2,7 @@
 # Program: hw2.py
 # Assignment: HW#2
 # Authors: Slava Borysyuk, Taylor Hunter
-# Date: 02/09/2025
+# Date: 03/02/2025
 # This program is a client that connects to two different AI models and sends messages to 
 # them in a loop. The client will send a message to the first AI model, then send the response 
 # to the second AI model, and then send the response back to the first AI model. 
